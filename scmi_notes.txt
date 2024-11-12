@@ -1,0 +1,63 @@
+Protocols:
+	definieren einzelne Gruppen von System Control und Management messages, protocol specifications beschreiben die messages die sie supporten
+
+Agents:
+	bezeichnet den Caller des SCMI
+
+Platform:
+	beschreibt die Hardware, die die messages interpretieren und die notwendingen Funktionen bereitstellen
+	
+Resource:
+	beschreibt eine Komponente der Hardware-platform die mittels SCMI messages kontrolliert werden kann
+	
+Transport:
+	beschreibt die Methode mittels welcher Protocol messages zwischen Agent und Platform kommuniziert werden
+	
+Modules:
+	beschreibt einen Code-Block der eine bestimmte Operation oder Gruppe von Operationen ausführt
+		++ modul aufbau: z.118 framework.md und z.147 framework.md, config in z.171 framework.md
+
+Elements: 
+	Resource die von einem Modul besessen und bestimmt/kontrolliert wird, z.217 framework.md
+
+Indices and Identifiers:
+	Indices:
+		identifizieren items innerhalb "parent-scope", z.b ein element, event, notification, API innerhalb modul Kontext, oder module im Kontext der firmware --> indices werden vom build system für jede firmware generiert und in fwk_module_idx.h platziert
+	Identifier:
+		identifieren items im globalen Kontext, so z.b das element eines Moduls von einem anderen Modul-Kontext,
+		identifier haben typen die beschreiben welche informationen diese beinhalten, avalaible identifier: z.287 framework.md
+
+APIs:
+	interfacing von modulen durch apis, declaring and using apis: z.308 ff framework.md
+		
+Events:
+	strukturierte messages von einem source zu einem target, (module, element, sub-element) --> eventhandling z.357 framework.md
+Notifications:
+	im Prinzip ein besonderes Event, wo ein modul eine Änderung in seinem Zustand mitteilt
+	
+
+	
+
+produkt implementieren:
+->product.mk file 
+->ordner struktur siehe z.50 framework.md
+->in jedem produkt muss eine firmware beinhalten, diese representiert ein software-image welches als teil des produkts geBUILDded wird.
+	jede firmware muss hierbei die von ihr genutzten module aufzählen und eine config für diese beinhhalten
+->jede firmware muss linker informationen beinhalten: -> fmw_memory.h z.69 framework.md
+->in Toolchain-*.cmake architecture target fürs image beschreiben z.84 framework.md
+
+	
+notes:	
+-> SCP Firmware funktioniert im Prinzip so:
+	1. pre-runtime phase: Init, -> modules, elements, sub elements, noch mehr? z.426 framework.md
+		- Module initialization
+		- Element initialization
+		- Post-initialization
+		- Bind
+		- Start
+	
+	2. runtime phase: 
+		event loop waiting for event or interrupt, wenn ein event kommt dann wird dieses gehandelt, danach wird kontrolle wieder an main loop gegeben, framework wird genutzt um diese interaktion von modulen bereitzustellen und zu überprüfen
+			(wenn pending events list leer ist, kann man zu 1. zurück kehren, (zb. um zu binden?) )
+-> error handling ist architecture spezifisch, muss ich selber festlegen
+	

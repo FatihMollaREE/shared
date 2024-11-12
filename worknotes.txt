@@ -1,0 +1,21 @@
+notes:
+-cr52 
+
+-fragen zur scp firmware:
+	+ brauche ich cmsis, was mit rtos?
+	+ eigentlicher/praktischer ablauf von scp/scmi, wie sieht es im betrieb aus, rausfinden damit ich weiss was das mindeste ich was ich brauche und ich weiss was genau sinnvoll ist, zb welches peripherie(wenn überhaupt?) vom v4h will ich nutzen
+	--> SCMI s.17
+	+ was ist mir arch layer, muss ich komplett neue machen für armv8-r?
+	
+	
+	
+gl:
+- welche module muss ich implementieren // ((wie genau implementiere ich die da, heisst welche sub elemente, welche dependecies von anderen elementen, wann init, wie config dazu))
+
+-> finde die grosse loop, mehr high level, wie läuft scmi ab
+-> schreib dir raus wie genau alles abläuft, wo ich anknüpfen muss mit meiner implementierung
+
+-> module zu implementieren: -reset, -clock, (-power) :: ,transport, vllt noch mehr?
+
+-fwk_arch_init , fwk_process_event_queue
+
