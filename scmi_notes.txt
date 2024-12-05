@@ -61,3 +61,5 @@ notes:
 			(wenn pending events list leer ist, kann man zu 1. zurück kehren, (zb. um zu binden?) )
 -> error handling ist architecture spezifisch, muss ich selber festlegen
 	
+	
+- module aufbau: fwk_module.h siehe struct fwk_module für funtkionen die implementiert werden müssen
