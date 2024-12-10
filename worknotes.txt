@@ -53,11 +53,21 @@ sdk startup:
 -->reset/module standby implementieren
 -->versuch mal eine srec datei so zuändern, dass du deine dummy software für den r core veränderst, dafür compilen und .o datei zu ner hex datei machen, dann in den ordner packen und flashen mit teraterm
 
+-->arch in archtitecture_support.md in doc, z.38
 
+		-> cmake verwendet bei mir standardmäßig nmake, generator muss richtig gewählt werden
+			---> "C:\Renesas\rcar-xos\v3.31.0\tools\cmake-3.21.0-windows-x86_64\bin\cmake.exe" -G "MinGW Makefiles" -S . -B build 
+			
 
-
-
-
+--> 1. dummy firmware angucken und schauen wie die cr-52 zum laufen kriegen, versuch mal hier deinen eigenen code rein zu kriegen
+	2. arm manual lesen, wie nimmt man einen cr-52 in betrieb
+	(3.) im linux, c code flashen (über ssh?) und angucken wie das alles läuft
+	
 board:
 	speicher:
+	
+boot-vorgang:
+
+linker script reading:
+
 		
