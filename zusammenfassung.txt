@@ -1,0 +1,123 @@
+Ziel: SCP-Firmware auf dem V4M
+
+	-SCP Firmware kann man nutzten um System Resourcen von einem anderen Prozessor als den Application-Core zu steuern um diesen zu entlasten und somit effizienz zu steigern
+	
+	-Das V4M ist hierbei ein SoC basierend auf einem Quad Cortex A-76 core ( 2cores x 2 cluster ), sowie 3 Cortex R-52 cores || Also einen a-76 prozessor mit 4 kernen, welche jeweils zu 2 in einem cluster sind und einen cr-52 prozessor mit 3 kernen
+	-Auf dem Board gibt es verschiedene Flashes, 2xQSPI(1x Hyperflash) und 1xeMMC, diese nutzt man um allgemein firmware zu speicher, die die CPUs ausführen sollen
+		Die verschiedenen Flashes haben hierbei unterschiedliche nutzten, z.B. ist eMMC etwas langsamer als die anderen beiden aber (günstiger?), deswegen wird z.B. das Linux image und sein dtb. hierauf gespeichert
+		allgemein werden die programme im flash (zur laufzeit) in den RAM geladen um dort von der CPU ausgeführt zu werden
+	-Es gibt verschiedene RAMs auf dem Board, unter anderem das "RT-VRAM" (SRAM) auf wo die firmware später hinsoll, sonst noch das System-Ram und das langsamere (aber günstigere) DRAM. Zugriff auf diese und allgemeines mapping erkenntlich durch address-map .excel,
+	
+	-V4M grayhawk aufsetzten:
+		1.R-Car SDK installiert:
+			Sammmlung von resourcen, tools, bibliotheken, docs usw. um betriebnahme zu erleichtern	
+		2.Flash bootloaders to the target board start up guide s.91
+		SCIF download mode wird durch switches gesetzt, einzelne images werden an jeweilige stelle geladen (tera term macro hilft hierbei)
+		danach wieder switches ändern um in Serial flash ROM boot mode zu wechseln
+			Flash Orte (startup-guide s.63):
+				-->	QSPI-Flash z.b. EB20_0000 (in RT-VRAM0 = EB20_0000 ~ EB2F-FFFF) || cr-52 (CX 2nd IPL) in System RAM E630_0000  \nur halb richtig
+				--> eMMC-Flash z.b. 5000_0000 u-boot-elf ... 																	   / genaueres im manual für den v4h 31.boot (erst später relevant)
+		(3. Linux image und dtb. wurden mithilfe von u-Boot aufs eMMC geflashed (Anleitung auf confluence/teams chat mit Matthias), dadurch kann nun auf dem A-76 linux laufen. U-Boot ist hierbei eine Art bootloader, der einem unter anderem beim flashen und initializieren hilft)
+		
+	-------------------------
+	-SCP-Firmware notes:
+		Protocols:
+			definieren einzelne Gruppen von System Control und Management messages, protocol specifications beschreiben die messages die sie supporten
+		Agents:
+			bezeichnet den Caller des SCMI
+		Platform:
+			beschreibt die Hardware, die die messages interpretieren und die notwendingen Funktionen bereitstellen
+		Resource:
+			beschreibt eine Komponente der Hardware-platform die mittels SCMI messages kontrolliert werden kann
+		Transport:
+			beschreibt die Methode mittels welcher Protocol messages zwischen Agent und Platform kommuniziert werden	
+		Modules:
+			beschreibt einen Code-Block der eine bestimmte Operation oder Gruppe von Operationen ausführt
+				++ modul aufbau: z.118 framework.md und z.147 framework.md, config in z.171 framework.md
+		Elements: 
+			Resource die von einem Modul besessen und bestimmt/kontrolliert wird, z.217 framework.md
+		Indices and Identifiers:
+			Indices:
+				identifizieren items innerhalb "parent-scope", z.b ein element, event, notification, API innerhalb modul Kontext, oder module im Kontext der firmware --> indices werden vom build system für jede firmware generiert und in fwk_module_idx.h platziert
+			Identifier:
+				identifieren items im globalen Kontext, so z.b das element eines Moduls von einem anderen Modul-Kontext,
+				identifier haben typen die beschreiben welche informationen diese beinhalten, avalaible identifier: z.287 framework.md
+		APIs:
+			interfacing von modulen durch apis, declaring and using apis: z.308 ff framework.md
+		Events:
+			strukturierte messages von einem source zu einem target, (module, element, sub-element) --> eventhandling z.357 framework.md
+		Notifications:
+			im Prinzip ein besonderes Event, wo ein modul eine Änderung in seinem Zustand mitteilt
+			
+		produkt implementieren:
+		->product.mk file 
+		->ordner struktur siehe z.50 framework.md
+		->in jedem produkt muss eine firmware beinhalten, diese representiert ein software-image welches als teil des produkts geBUILDded wird.
+			jede firmware muss hierbei die von ihr genutzten module aufzählen und eine config für diese beinhhalten
+		->jede firmware muss linker informationen beinhalten: -> fmw_memory.h z.69 framework.md
+		->in Toolchain-*.cmake architecture target fürs image beschreiben z.84 framework.md
+			
+		notes:	
+		-> SCP Firmware funktioniert im Prinzip so:
+			1. pre-runtime phase: Init, -> modules, elements, sub elements,..  z.426 framework.md
+				- Module initialization
+				- Element initialization
+				- Post-initialization
+				- Bind
+				- Start
+			
+			2. runtime phase: 
+				event loop waiting for event or interrupt, wenn ein event kommt dann wird dieses gehandelt, danach wird kontrolle wieder an main loop gegeben, framework wird genutzt um diese interaktion von modulen bereitzustellen und zu überprüfen
+					(wenn pending events list leer ist, kann man zu 1. zurück kehren, (zb. um zu binden, das muss aber vorher festgelegt werden) )
+		-> error handling ist architecture spezifisch, muss ich selber festlegen
+	
+		- module aufbau: fwk_module.h siehe struct fwk_module für funtkionen die implementiert werden müssen
+		-------------------------
+		
+	- SCP-Firmware grober Aufbau und Funktion verstanden, damit die SCP-Firmware auf meinem Cr-52 laufen kann muss ich 1.Modul ebene passend konfigurieren( als Test hierfür erstmal nur ein Reset-Modul konfiguriert, rest sollte aber schnell gehen, da vorarbeitet hierfür geleistet wurde) und 2. archtitecture spezifischen Code implementieren, konkret wie kriege ich den CR-52 zum laufen/initialisieren. 2 Möglichkeiten dies rauszufinden. Dummy-firmware analysieren oder/(und) im arm manual und doc nachschauen
+	
+	allgemeine notes /placeholder/:
+	
+	-mein arm-compiler:
+		-> C:\Program Files (x86)\Arm GNU Toolchain arm-none-eabi\13.3 rel1\bin
+	
+	-CR-52 Initialisierung:
+		-> dummy code: C:\Renesas\rcar-xos\v3.31.0\sw_src\renesas\applications\platform\others\ipl\src\v4h\src\Dummy_RTOS
+		-> cr-52 rtos dummy fw flashing:
+			-> $ export PATH="$PATH:/c/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/bin"  (mein git bash scheint noch zu spinnen, meine env variables werden nicht übernommen, also manual gesetzt)
+			-> $ make CROSS_COMPILE=arm-none-eabi-
+		-> nachschauen:
+			stack pointer init, intr vec. table, cache and mem init,... siehe unten 
+		-> allgemeine notes:
+			- <execution levels> -> also in welchem modus läuft der prozessor z.b. privileged usw. im Prinzip auf welche Resourcen kann er zugreifen
+			- <entry point>, nach dem reset starte prozessor vom reset vector, diese muss definiert werden | ebenso der <boot mode>, bsp. von ram rom oder bootloader
+			- <stack pointer> müssen init werden,  hier gibt es scheinbar verschiedene für versch. modes (supervisor, irq, fiq?)
+			- <interrupt vector table>
+			- <memory init> heißt z.B. sections wie .bss clearen oder für .data daten aus rom in ram laden falls nötig
+			- <proccesor features> wie z.B. mpu oder interrupt controller konfigurieren
+			- jetzt kann eig. zum c code gesprungen werden
+			* (brauch ich noch was anderes, peripherals wie pll, chache aufsetzten oderso?)
+			
+	
+	-Build Prozess der SCP-Firmware:
+		-> zusammenspiel von CMake und Make
+		-> juno wurde beispielhaft schon gebuilded, das hat geklappt, am ende kriegt man ein .bin .elf .map raus, wie man sie flashed muss am ende geschaut werden, im Prinzip brauche ich .srec (im Prinzip binary datei mit adressinformationen // ASCII kodiert und mit Prüfsumme)
+		-> weiteres kommt sobald arch für armv8-r fertig ist
+		-> cmake verwendet bei mir standardmäßig nmake, generator muss richtig gewählt werden
+			---> "C:\Renesas\rcar-xos\v3.31.0\tools\cmake-3.21.0-windows-x86_64\bin\cmake.exe" -G "MinGW Makefiles" -S . -B build 
+		
+
+		
+	-Linux:
+		->
+		
+	-Linker
+		-> basierend auf linkerscript  kann der Linker .o object dateien in .elf umwandeln. Diese hier beschriebenen Addressen müssen mit dem spätrigen Addressen übereinstimmen, bsp. rtos.ld.S [ RAM (rwxa): ORIGIN = 0xE2100000, LENGTH = 0x00400000 || laut address map ist 0xE2100000 auch innerhalb von RT_VRAM1 und wird laut makro nach 0xE2100000 geflashed (diese addresse scheint auf emmc gemappt zu sein, wenn ich alles richtig verstanden habe) ]
+		
+	-Boot
+		-> C:\Renesas\rcar-xos\v3.31.0\docs\sw\boot\ipl
+		-> RH850 dient als ICUMX: 
+		
+	-linker script sorgt dafür dass alles an der richtig stelle ist. initiale asm initialisierung sorgt dafür dass der prozessor "konfiguriert" wird und dann in den c code gesprungen werden kann (wo genau wird in der asm datei gesagt), in diesem c code der zum arch-layer gehört rufe ich dann das framework auf nur muss ich ihm dann noch meinen arch_init_driver mitgeben, hierzu muss ich vllt. noch die interrupt funktionen füllen, danach wird aber kontroller ans framework übergeben
+	
+	

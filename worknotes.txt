@@ -1,35 +1,11 @@
-notes:
--> endziel: scp firmware hinkriegen dass die mit dem linus auf den ap cores läuft bzw die ap cores scmi calls zum scp machen, dann messen wie viele calls werden gemacht, wie lange dauern die, wie gross ist die scp firmare, ...
-
--cr52 
-
--fragen zur scp firmware:
-	+ brauche ich cmsis, was mit rtos?
-	+ eigentlicher/praktischer ablauf von scp/scmi, wie sieht es im betrieb aus, rausfinden damit ich weiss was das mindeste ich was ich brauche und ich weiss was genau sinnvoll ist, zb welches peripherie(wenn überhaupt?) vom v4h / v4m? will ich nutzen
-	--> SCMI s.17
-	+ was ist mir arch layer, muss ich komplett neue machen für armv8-r?
 	
-	
-	
-gl:
-
-
 -> module zu implementieren: -reset, -clock, (-power) :: ,transport, vllt noch mehr?
 
 -> was macht die framework konkret mit den Modulen, wie handelt es sie, was braucht es von ihnen
 
 -fwk_arch_init , fwk_process_event_queue
 
-?? muss ich nicht wissen, wie man den SoC überhaupt aufsetzt? damit ich weiss wie ich jz überhaupt mein clock module(also CPG) konfigurieren muss
-?? wie kriegt man das board allgemein zum laufen, was muss alles gemacht werden?
-
-jz:
-	1. wie findet die kommunikation statt mit der firmware, schreibt der agent einfach iwo in memory zb 0xABCD0011AA und die firmware handelt das dann einfach?
-	
-
-// ### ein element ist im prinzip ein objekt was vom modul kontrolliert wird, zb die unit clock1 vom soc (kp ob es die gibt oder die so heisst)
-// --> also kann ich erstmal ein element machen oder? also nur eine clock konfigurieren? macht das sinn?
-
+1. wie findet die kommunikation statt mit der firmware, schreibt der agent einfach iwo in memory zb 0xABCD0011AA und die firmware handelt das dann einfach?
 
 tmp:
 	Bytes transferred = 491562064 (1d4ca450 hex)
@@ -41,23 +17,12 @@ sdk startup:
 ->  C:\ProgramData\chocolatey\bin\ make.disabled
 ->  C:\msys64\ucrt64\bin gcc.exe -> gcc.disabled   g++.exe -> gxx.disabled 
 
-
-
 -notes:
--verschiedene speicherformen verstehen, sram z.b. hier sollte glaub ich meine scp-firmware laufen.
--allgemein verstehen was gibt es auf dem board, was brauche ich davon, speicher, cores, (wie funktioniert starten/initialisieren)
--ipl, bootloader, wo kommt welches image hin, siehe excel z.b.
 -wie flashe ich etwas, was bedeutet es zu flashen, 1) über teraterm, 2) über uboot,
 -ich kann schlecht scp-firmware auf a-core laufen, weil lunux sich auf dieses cores ausbreitet, also muss ich r-core nutzten und arch im code dafür anpassen
--grundlagen ethernet, ipaddr, ethernet addr, ssh usw.
 -->reset/module standby implementieren
--->versuch mal eine srec datei so zuändern, dass du deine dummy software für den r core veränderst, dafür compilen und .o datei zu ner hex datei machen, dann in den ordner packen und flashen mit teraterm
 
 -->arch in archtitecture_support.md in doc, z.38
-
-		-> cmake verwendet bei mir standardmäßig nmake, generator muss richtig gewählt werden
-			---> "C:\Renesas\rcar-xos\v3.31.0\tools\cmake-3.21.0-windows-x86_64\bin\cmake.exe" -G "MinGW Makefiles" -S . -B build 
-			
 
 --> 1. dummy firmware angucken und schauen wie die cr-52 zum laufen kriegen, versuch mal hier deinen eigenen code rein zu kriegen
 	2. arm manual lesen, wie nimmt man einen cr-52 in betrieb
@@ -70,4 +35,10 @@ boot-vorgang:
 
 linker script reading:
 
-		
+
+ny:
+-im prinzip muss ich nur rausfinden wie ich meinen cr-52 aufsetzte, all die sachen die ich in zusammenfassung.txt aufgeschrieben habe, dann das in assembler programmieren, dann entweder eig. linker skript schreiben oder vllt. das von <common/src/arch.ld.S> nutzten, 
+-cr-52 arch lernen über manual und vergleich mit rtos dummy
+-asm bisschen angucken
+-linker scripts
+-(cmake/make)		
