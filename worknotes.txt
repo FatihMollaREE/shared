@@ -32,13 +32,15 @@ board:
 	speicher:
 	
 boot-vorgang:
+-vgl. S906: es scheint als würde doch boot parameter ins rt-vram0 geladen werden, dann kann ich doch hier nicht mein programm hinschreiben oder? oder ist es nach dem startup wieder frei? ******************************************
 
 linker script reading:
 
 
 ny:
--im prinzip muss ich nur rausfinden wie ich meinen cr-52 aufsetzte, all die sachen die ich in zusammenfassung.txt aufgeschrieben habe, dann das in assembler programmieren, dann entweder eig. linker skript schreiben oder vllt. das von <common/src/arch.ld.S> nutzten, 
--cr-52 arch lernen über manual und vergleich mit rtos dummy
--asm bisschen angucken
--linker scripts
--(cmake/make)		
+-vllt muss ich mein linker skript noch etwas anpassen?
+-evnt mod_rcar(4)_system implementieren
+-nochmal auf mem konfigurationen schauen glaube bin da nicht ganz effizient
+
+beginn nächstes mal mit:
+-config_transport.c dafür muss ich glaub auch ^ fertig machen

@@ -4,7 +4,7 @@ Ziel: SCP-Firmware auf dem V4M
 	
 	-Das V4M ist hierbei ein SoC basierend auf einem Quad Cortex A-76 core ( 2cores x 2 cluster ), sowie 3 Cortex R-52 cores || Also einen a-76 prozessor mit 4 kernen, welche jeweils zu 2 in einem cluster sind und einen cr-52 prozessor mit 3 kernen
 	-Auf dem Board gibt es verschiedene Flashes, 2xQSPI(1x Hyperflash) und 1xeMMC, diese nutzt man um allgemein firmware zu speicher, die die CPUs ausführen sollen
-		Die verschiedenen Flashes haben hierbei unterschiedliche nutzten, z.B. ist eMMC etwas langsamer als die anderen beiden aber (günstiger?), deswegen wird z.B. das Linux image und sein dtb. hierauf gespeichert
+		Die verschiedenen Flashes haben hierbei unterschiedliche Nutzten, z.B. ist eMMC etwas langsamer als die anderen beiden aber (günstiger?), deswegen wird z.B. das Linux image und sein dtb. hierauf gespeichert
 		allgemein werden die programme im flash (zur laufzeit) in den RAM geladen um dort von der CPU ausgeführt zu werden
 	-Es gibt verschiedene RAMs auf dem Board, unter anderem das "RT-VRAM" (SRAM) auf wo die firmware später hinsoll, sonst noch das System-Ram und das langsamere (aber günstigere) DRAM. Zugriff auf diese und allgemeines mapping erkenntlich durch address-map .excel,
 	
@@ -88,15 +88,15 @@ Ziel: SCP-Firmware auf dem V4M
 			-> $ make CROSS_COMPILE=arm-none-eabi-
 		-> nachschauen:
 			stack pointer init, intr vec. table, cache and mem init,... siehe unten 
-		-> allgemeine notes:
+		-> allgemeine notes wie man einen Prozessor initialisiert:
 			- <execution levels> -> also in welchem modus läuft der prozessor z.b. privileged usw. im Prinzip auf welche Resourcen kann er zugreifen
-			- <entry point>, nach dem reset starte prozessor vom reset vector, diese muss definiert werden | ebenso der <boot mode>, bsp. von ram rom oder bootloader
+			- <entry point>, nach dem reset startet prozessor vom reset vector, dieser muss definiert werden | ebenso der <boot mode>, bsp. von ram rom oder bootloader
 			- <stack pointer> müssen init werden,  hier gibt es scheinbar verschiedene für versch. modes (supervisor, irq, fiq?)
 			- <interrupt vector table>
 			- <memory init> heißt z.B. sections wie .bss clearen oder für .data daten aus rom in ram laden falls nötig
 			- <proccesor features> wie z.B. mpu oder interrupt controller konfigurieren
 			- jetzt kann eig. zum c code gesprungen werden
-			* (brauch ich noch was anderes, peripherals wie pll, chache aufsetzten oderso?)
+			* (brauch ich noch was anderes, peripherals wie pll, chache aufsetzten oder sonstiges?)
 			
 	
 	-Build Prozess der SCP-Firmware:
@@ -105,6 +105,16 @@ Ziel: SCP-Firmware auf dem V4M
 		-> weiteres kommt sobald arch für armv8-r fertig ist
 		-> cmake verwendet bei mir standardmäßig nmake, generator muss richtig gewählt werden
 			---> "C:\Renesas\rcar-xos\v3.31.0\tools\cmake-3.21.0-windows-x86_64\bin\cmake.exe" -G "MinGW Makefiles" -S . -B build 
+		-> Build prozess befehle vorab:
+			export PATH=$PATH:/c/Renesas/rcar-xos/v3.31.0/tools/cmake-3.21.0-windows-x86_64/bin )
+			export CMAKE_GENERATOR="MinGW Makefiles"
+			export PATH=$PATH:"/c/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/bin/"
+
+
+		->eigentliches builden:
+		-tmp: cmake . -B build -DSCP_FIRMWARE_SOURCE_DIR:PATH="rcar4/scp_ramfw"
+
+			
 		
 
 		
@@ -117,7 +127,13 @@ Ziel: SCP-Firmware auf dem V4M
 	-Boot
 		-> C:\Renesas\rcar-xos\v3.31.0\docs\sw\boot\ipl
 		-> RH850 dient als ICUMX: 
+		-beim booten kann man per MD Pins einstellen ob man XIP mode boot haben will oder On-Chip ROM boot, in manual findet man dann, bei welcher Addresse gestartet wird(secure ROM) -> btz. ich glaube man kann diese sogar ändern vgl. S.902
 		
 	-linker script sorgt dafür dass alles an der richtig stelle ist. initiale asm initialisierung sorgt dafür dass der prozessor "konfiguriert" wird und dann in den c code gesprungen werden kann (wo genau wird in der asm datei gesagt), in diesem c code der zum arch-layer gehört rufe ich dann das framework auf nur muss ich ihm dann noch meinen arch_init_driver mitgeben, hierzu muss ich vllt. noch die interrupt funktionen füllen, danach wird aber kontroller ans framework übergeben
 	
+	-mem layout in scp-fw:
+	FMW_MEM0_BASE SCP_RAM_BASE 0xE2100000
+	FMW_MEM0_SIZE SCP_RAM_SIZE 384*1024 (384kB)
+	FMW_STACK_SIZE 2*1024
 	
+	-> mem0 von 0xE210_0000 bis 0xE216_0000 - 2*1024 (letzte 2 kB sind Stack)
