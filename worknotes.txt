@@ -47,8 +47,26 @@ beginn nächstes mal mit:
 
 ->glaub ich muss interrupts richtig einschalten, vorallem um out-band com zu ermöglichen 
 		schau nochmal ob du einen richtigen int driver überhaupt ans fwk übergibts das ist wichtig
--> selber die interupts einzurichten sehr kompliziert, vllt kann ich armv8-a nutzten, sollen ähnlich sein laut dem einen manual? armv8 arch
+-> selber die interupts einzurichten sehr kompliziert, vllt kann ich armv8-a nutzten, sollen ähnlich sein laut dem einen manual? armv8 arch,
+	bezüglich GICD GICC usw. vllt mal nachschauen was machen sie dann kann ich einfacher suchen im manual welchen registern sie entsprechen?
 
 nächstes mal:
--weiter mit stück für stück builden, aktuell config_power_domain.h
+-weiter mit stück für stück builden, aktuell config_power_domain.h -> ich mach es jz erstmal etwas grober damit es compiled, vllt muss ich nochmal drüber gucken später
+
+maken klappt nicht:
+
+In file included from C:\Users\a5137749\Documents\Abteilungen\shared\scp-rcar4\SCP-firmware\product\rcar4\module\rcar4_pd_core\sr
+c\mod_rcar4_pd_core.c:12:
+C:\Users\a5137749\Documents\Abteilungen\shared\scp-rcar4\SCP-firmware\product\rcar4\module\rcar4_pd_core\include/mod_rcar4_pd_cor
+e.h:14:10: fatal error: mod_power_domain.h: No such file or directory
+   14 | #include <mod_power_domain.h>
+      |          ^~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make[2]: *** [module\modules\rcar4-pd-core\CMakeFiles\module-rcar4-pd-core.dir\build.make:75: module/modules/rcar4-pd-core/CMakeF
+iles/module-rcar4-pd-core.dir/src/mod_rcar4_pd_core.c.obj] Error 1
+make[1]: *** [CMakeFiles\Makefile2:1830: module/modules/rcar4-pd-core/CMakeFiles/module-rcar4-pd-core.dir/all] Error 2
+make: *** [makefile:90: all] Error 2
+
+---->
+rcar4_system module bin ich aktuell
 						
