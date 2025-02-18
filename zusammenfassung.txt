@@ -114,6 +114,10 @@ Ziel: SCP-Firmware auf dem V4M
 		->eigentliches builden:
 		-tmp: cmake . -B build -DSCP_FIRMWARE_SOURCE_DIR:PATH="rcar4/scp_ramfw"
 
+		.elf -> .srec:
+		 arm-none-eabi-objcopy -O srec rcar4-bl.elf rcar4-bl.srec
+
+
 			
 		
 
@@ -137,3 +141,12 @@ Ziel: SCP-Firmware auf dem V4M
 	FMW_STACK_SIZE 2*1024
 	
 	-> mem0 von 0xE210_0000 bis 0xE216_0000 - 2*1024 (letzte 2 kB sind Stack)
+	
+	-> Lauterbach tracen
+		- powerviewinstance? start
+				//- system.cpu rcarv4m
+				//- CPU system setting -> attach
+		- skript
+		
+	-> cr.52 technical ref manual mpu wie einstellen:
+		https://developer.arm.com/documentation/100026/latest/

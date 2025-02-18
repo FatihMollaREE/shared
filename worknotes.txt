@@ -50,23 +50,16 @@ beginn nächstes mal mit:
 -> selber die interupts einzurichten sehr kompliziert, vllt kann ich armv8-a nutzten, sollen ähnlich sein laut dem einen manual? armv8 arch,
 	bezüglich GICD GICC usw. vllt mal nachschauen was machen sie dann kann ich einfacher suchen im manual welchen registern sie entsprechen?
 
-nächstes mal:
--weiter mit stück für stück builden, aktuell config_power_domain.h -> ich mach es jz erstmal etwas grober damit es compiled, vllt muss ich nochmal drüber gucken später
-
-maken klappt nicht:
-
-In file included from C:\Users\a5137749\Documents\Abteilungen\shared\scp-rcar4\SCP-firmware\product\rcar4\module\rcar4_pd_core\sr
-c\mod_rcar4_pd_core.c:12:
-C:\Users\a5137749\Documents\Abteilungen\shared\scp-rcar4\SCP-firmware\product\rcar4\module\rcar4_pd_core\include/mod_rcar4_pd_cor
-e.h:14:10: fatal error: mod_power_domain.h: No such file or directory
-   14 | #include <mod_power_domain.h>
-      |          ^~~~~~~~~~~~~~~~~~~~
-compilation terminated.
-make[2]: *** [module\modules\rcar4-pd-core\CMakeFiles\module-rcar4-pd-core.dir\build.make:75: module/modules/rcar4-pd-core/CMakeF
-iles/module-rcar4-pd-core.dir/src/mod_rcar4_pd_core.c.obj] Error 1
-make[1]: *** [CMakeFiles\Makefile2:1830: module/modules/rcar4-pd-core/CMakeFiles/module-rcar4-pd-core.dir/all] Error 2
-make: *** [makefile:90: all] Error 2
 
 ---->
-rcar4_system module bin ich aktuell
-						
+
+
+-> gic: https://developer.arm.com/documentation/100026/0100/generic-interrupt-controller/gic-programmers-model/distributor-registers--gicd-?lang=en
+
+-> mit lauterbach code debuggen, falls ldceq kommt habe ich warscheinlich iwas mit mpu falsch gemacht
+	versuch mal skript so zuscirehen dass mpu mit software übereinstimmt
+	e210 2440 -> scheint als würde was mit malloc nicht gehen, entweder kein speicher frei oder vllt ist es nicht richtig implementiert, ich glaube fwk_trap löst aus !!! scheint so als hätte ich kein calloc/malloc implementiert
+	
+debugging:
+	-ich muss glaube ich rcar4_clock machen jz richtig, nur ist die cpg ganz anders als beim rcar3, muss schauen was ich hier mache, was wirklich notwendig ist usw, vllt ist es sogar sinnvoller komplett alles selber zu schreiben als einzeln zu ändern oder woanders her config für plll usw nehmen 
+	-> clock alles rauszufinden erscheint mir sehr aufwendig
