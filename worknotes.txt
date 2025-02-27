@@ -63,3 +63,25 @@ beginn nächstes mal mit:
 debugging:
 	-ich muss glaube ich rcar4_clock machen jz richtig, nur ist die cpg ganz anders als beim rcar3, muss schauen was ich hier mache, was wirklich notwendig ist usw, vllt ist es sogar sinnvoller komplett alles selber zu schreiben als einzeln zu ändern oder woanders her config für plll usw nehmen 
 	-> clock alles rauszufinden erscheint mir sehr aufwendig
+	
+	-> clock ist wohl eh gefährlich da a cores plll übershrieben werden, plls msollte ich eig nie setztten, ich versuche jz erstmal clock init zu backdooren
+	-> aktuelles problem, fwk_module_is_valid_notification_id bei rcar4_system_start ist iwie falsch bzw hier failt es
+	--> fwk_notication.c z.214, failt aber eig scheint mir schon als wäre bei 202 schon eine fehler, bzw dlist null?
+	
+	// ist fwk_notification_init discarded? soll das so?
+	
+	vllt in meinen code machen
+	#ifdef BUILD_HAS_NOTIFICATION
+    .extern __fwk_notification_reset
+#endif
+
+	-> aktuell : bis transport_start klappts, dann "failt" es, bin aber noch nicht sicher, ob die linked lists so richtig sind, aber kann schon sein CONTAINER
+	-es scheint so als würde das f3 step over macnchmal! zu problemen führen )weil ein breakpoint gesetzt wird?) wie wäre es hier denn im normalen betrieb?
+	
+	-> Ziel: module 12 element 1 soll verändert werden mit scmi, aktuell über FWK_Put_Event aber vllt soll das gar nicht so?
+		:eigenes modul schreiben, welches firmware oder scmi messages schicken kann?
+		
+	akt:
+	normalen betrieb simulieren, brauche ich dafür intr? gic usw richtig aufsetzten, oder gehts auch ohne was würde man normal machen 
+		muss ich für scmi calls mod_scmi_agent implementieren? auch wenn, wenn man jz scp ohne scmi laufen lassen will, wie führt man dann "Befehle" aus?
+		notes: mfis register,

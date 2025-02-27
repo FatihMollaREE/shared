@@ -113,6 +113,9 @@ Ziel: SCP-Firmware auf dem V4M
 
 		->eigentliches builden:
 		-tmp: cmake . -B build -DSCP_FIRMWARE_SOURCE_DIR:PATH="rcar4/scp_ramfw"
+		
+		hilfe: $ cd .. && cmake . -B DEBUGbuild -DSCP_FIRMWARE_SOURCE_DIR:PATH="rcar4/scp_ramfw" && cd DEBUGBuild && make
+
 
 		.elf -> .srec:
 		 arm-none-eabi-objcopy -O srec rcar4-bl.elf rcar4-bl.srec
@@ -135,13 +138,23 @@ Ziel: SCP-Firmware auf dem V4M
 		
 	-linker script sorgt dafür dass alles an der richtig stelle ist. initiale asm initialisierung sorgt dafür dass der prozessor "konfiguriert" wird und dann in den c code gesprungen werden kann (wo genau wird in der asm datei gesagt), in diesem c code der zum arch-layer gehört rufe ich dann das framework auf nur muss ich ihm dann noch meinen arch_init_driver mitgeben, hierzu muss ich vllt. noch die interrupt funktionen füllen, danach wird aber kontroller ans framework übergeben
 	
-	-mem layout in scp-fw:
-	FMW_MEM0_BASE SCP_RAM_BASE 0xE2100000
-	FMW_MEM0_SIZE SCP_RAM_SIZE 384*1024 (384kB)
-	FMW_STACK_SIZE 2*1024
 	
-	-> mem0 von 0xE210_0000 bis 0xE216_0000 - 2*1024 (letzte 2 kB sind Stack)
-	
+	-Memory
+		woher weiß man wo die nachrichten hinmüssen normalerweise -> FDT oder ACPI wird von arm empfohlen
+		-mem layout in scp-fw:
+		FMW_MEM0_BASE SCP_RAM_BASE 0xE2100000
+		FMW_MEM0_SIZE SCP_RAM_SIZE 384*1024 (384kB)
+		FMW_STACK_SIZE 2*1024
+		
+		-> mem0 von 0xE210_0000 bis 0xE216_0000 - 2*1024 (letzte 2 kB sind Stack)	
+			//(SDS) Memory Region: Used for structured storage of data that is shared between SCP Firmware and Application Processor firmware
+		-> sds region 0xE630_4000
+		-> SCMI_PAYLOAD_S_A2P_BASE
+		
+		-> Shared memory area layout scmi.pdf s.205
+		
+		
+		
 	-> Lauterbach tracen
 		- powerviewinstance? start
 				//- system.cpu rcarv4m
@@ -150,3 +163,27 @@ Ziel: SCP-Firmware auf dem V4M
 		
 	-> cr.52 technical ref manual mpu wie einstellen:
 		https://developer.arm.com/documentation/100026/latest/
+		
+		
+	-> Aufbau SCMI message:				meist 0
+		| 31 : 28 | 27 : 18 | 17 : 10 | 9 : 8 | 7 : 0 |  --> alles in little endian
+		 res: zero| token  protocol_id message_type message_id
+	protocal_attributes um rauszufinden welche protokolle zur auswahl stehen s.28 scmi.pdf:  
+		message_id 0x1 protocol_id 0x10
+		
+		agents sind definiert in irgendeiner header datei
+		OSPM agent: base: 0xE630_6000 size:128 bytes
+	
+		byte length
+		0x4		0x4					0x8		0x4					0x4			0x4				N
+		res		channel_status		res		channel_flags		length		msg_header		msg_payload
+		0x0 	0x4					0x8		0x10				0x14		0x18			0x1C
+		offset
+	
+		0x0		0x0?				0x0?	0x0					0x4?		
+		
+	-> noch zu implementieren:
+		-interrupts richtig ein und ausschalten, aktuell sind da nur dummys
+		ich glaube ich brauche die auch bzw muss die auslösen wenn ich scmi calls machen will
+		
+		wie soll der normale ablauf sein im betrieb?
