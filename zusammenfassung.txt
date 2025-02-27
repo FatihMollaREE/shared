@@ -101,7 +101,7 @@ Ziel: SCP-Firmware auf dem V4M
 	
 	-Build Prozess der SCP-Firmware:
 		-> zusammenspiel von CMake und Make
-		-> juno wurde beispielhaft schon gebuilded, das hat geklappt, am ende kriegt man ein .bin .elf .map raus, wie man sie flashed muss am ende geschaut werden, im Prinzip brauche ich .srec (im Prinzip binary datei mit adressinformationen // ASCII kodiert und mit Prüfsumme)
+		-> juno wurde beispielhaft schon gebuilded, das hat geklappt, am ende kriegt man ein .bin .elf .map raus, wie man sie flashed muss am ende geschaut werden, im Prinzip brauche ich .srec (also binary datei mit adressinformationen // ASCII kodiert und mit Prüfsumme)
 		-> weiteres kommt sobald arch für armv8-r fertig ist
 		-> cmake verwendet bei mir standardmäßig nmake, generator muss richtig gewählt werden
 			---> "C:\Renesas\rcar-xos\v3.31.0\tools\cmake-3.21.0-windows-x86_64\bin\cmake.exe" -G "MinGW Makefiles" -S . -B build 
