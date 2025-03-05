@@ -149,7 +149,7 @@ Ziel: SCP-Firmware auf dem V4M
 		-> mem0 von 0xE210_0000 bis 0xE216_0000 - 2*1024 (letzte 2 kB sind Stack)	
 			//(SDS) Memory Region: Used for structured storage of data that is shared between SCP Firmware and Application Processor firmware
 		-> sds region 0xE630_4000
-		-> SCMI_PAYLOAD_S_A2P_BASE
+		-> SCMI_PAYLOAD_S_A2P_BASE 0xE630_4DC0 
 		
 		-> Shared memory area layout scmi.pdf s.205
 		

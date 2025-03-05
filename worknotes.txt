@@ -85,3 +85,7 @@ debugging:
 	normalen betrieb simulieren, brauche ich dafür intr? gic usw richtig aufsetzten, oder gehts auch ohne was würde man normal machen 
 		muss ich für scmi calls mod_scmi_agent implementieren? auch wenn, wenn man jz scp ohne scmi laufen lassen will, wie führt man dann "Befehle" aus?
 		notes: mfis register,
+		
+	ende:
+	-schreibe ein skript welches in speicher schreibt und dann mithilfe von scp firmware z.b reset module register beschreibt
+		problem ist, selbst wenn ich in den (ich glaube richtigen) speicher meine scmi nachricht reinschreibe, lösst ja erstmal kein intr aus, sollte das denn so sein? falls nein was soll stattdessen und woher weiss du firmware hier ist was? falls doch, warum passiert es nicht?
