@@ -89,3 +89,8 @@ debugging:
 	ende:
 	-schreibe ein skript welches in speicher schreibt und dann mithilfe von scp firmware z.b reset module register beschreibt
 		problem ist, selbst wenn ich in den (ich glaube richtigen) speicher meine scmi nachricht reinschreibe, lösst ja erstmal kein intr aus, sollte das denn so sein? falls nein was soll stattdessen und woher weiss du firmware hier ist was? falls doch, warum passiert es nicht?
+		
+		-notes zum code:
+			--> mod_transport.c z.45 ist def fur einen transport_channel_ctx, hier findet man sowas wie outband mailbox rdy und auch buffer pointer und api pointer, schau dir das mal an im trace32 welche werte die hier alle haben
+			--> in transport init werden ja auch die channels erstmal initialisiert, heisst hier kann ich schauen wie viele channel und was ihrer outband addresse ist
+			--> transport bindet ja an ich glaube mfis, warum macht er das, erwartet er hier sein intr?
