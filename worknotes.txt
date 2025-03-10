@@ -94,3 +94,13 @@ debugging:
 			--> mod_transport.c z.45 ist def fur einen transport_channel_ctx, hier findet man sowas wie outband mailbox rdy und auch buffer pointer und api pointer, schau dir das mal an im trace32 welche werte die hier alle haben
 			--> in transport init werden ja auch die channels erstmal initialisiert, heisst hier kann ich schauen wie viele channel und was ihrer outband addresse ist
 			--> transport bindet ja an ich glaube mfis, warum macht er das, erwartet er hier sein intr?
+			
+		debuging:
+			1.channel:: channel_ctx->in 	0xE21218E8
+						channel_ctx->out 	0xE2121970
+						
+	-> ich glaube wenn intr auslösst passiert folgendes: beim init wurde den interrupt nummern zugewiesen welche isr aufgerufen werden soll, in meinem fall mfis sollte der dann die signal msg api aufrufen, welche dann put_event ausführt!!!
+						
+		:: ich gehe vorübergehend davon aus, dass vom ap core 0 geschreiben wird und dann beim r core 0 ein intr ausgelöst werden soll
+
+			mfismh_start element 1, in add_entry läuft was schief, ich glaube dass es vllt was mit meiner intr nr von 117 zu tun hat? muss ich irgenwdo angeben welche erlaubt sind? würde es denn funktionieren wenn ich statt 117 hier die alten nr hinschreibe
