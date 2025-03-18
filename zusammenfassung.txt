@@ -106,9 +106,7 @@ Ziel: SCP-Firmware auf dem V4M
 		-> cmake verwendet bei mir standardmäßig nmake, generator muss richtig gewählt werden
 			---> "C:\Renesas\rcar-xos\v3.31.0\tools\cmake-3.21.0-windows-x86_64\bin\cmake.exe" -G "MinGW Makefiles" -S . -B build 
 		-> Build prozess befehle vorab:
-			export PATH=$PATH:/c/Renesas/rcar-xos/v3.31.0/tools/cmake-3.21.0-windows-x86_64/bin
-			export CMAKE_GENERATOR="MinGW Makefiles"
-			export PATH=$PATH:"/c/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/bin/"
+			export PATH=$PATH:/c/Renesas/rcar-xos/v3.31.0/tools/cmake-3.21.0-windows-x86_64/bin || export CMAKE_GENERATOR="MinGW Makefiles" || export PATH=$PATH:"/c/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/bin/"
 
 
 		->eigentliches builden:

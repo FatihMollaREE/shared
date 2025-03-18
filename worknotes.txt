@@ -103,4 +103,9 @@ debugging:
 						
 		:: ich gehe vorübergehend davon aus, dass vom ap core 0 geschreiben wird und dann beim r core 0 ein intr ausgelöst werden soll
 
-			mfismh_start element 1, in add_entry läuft was schief, ich glaube dass es vllt was mit meiner intr nr von 117 zu tun hat? muss ich irgenwdo angeben welche erlaubt sind? würde es denn funktionieren wenn ich statt 117 hier die alten nr hinschreibe
+	-> ich muss also nochmal gucken, dass die interrupts richtig aktiviert werden, muss hier gucken auf gicd, gicc mfis und vllt sogar intc modul
+	
+	kann es sein dass gicd_ctlr nich richtig gesetzt wird? was sind überhaupt die groups? vorallem 0 und 1 usw
+	
+	tmpNotes:
+	
