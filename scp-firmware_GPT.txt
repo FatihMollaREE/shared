@@ -1,0 +1,80 @@
+Was soll die Firmware machen?
+=============================
+Die Firmware entlastet den eigentlichen Application Core (AP) und spart so Ressourcen. 
+Ein anderer Prozessor (in unserem Fall der CR-52) übernimmt bestimmte Aufgaben, darunter:
+
+- Power Management
+- Low-Power-Modi
+- Clock & Voltage Control
+- Sensor-Überwachung
+- Speicherverwaltung
+- Weitere Funktionen, die je nach Bedarf ergänzt werden können (wird im Folgenden erläutert).
+
+-------------------------------------------------------------------------------
+
+Wie ist die Firmware aufgebaut?
+===============================
+Die Firmware besteht aus drei Layern:
+
+1. Framework:
+   - Stellt das äußere Gerüst der Firmware dar und sorgt für korrekte Initialisierung und Laufzeit.
+   - Nutzt Informationen aus den beiden anderen Layern (Architektur und Module).
+   - Wird vollständig von ARM bereitgestellt und ist so generisch geschrieben, dass keine Anpassung erforderlich ist.
+   - Enthält die Main-Loop, die zur Laufzeit aktiv ist und auf Events/Aufgaben wartet.
+
+2. Architektur:
+   - Definiert die spezifische Architektur des Prozessors oder Produkts, auf dem die SCP-Firmware läuft.
+   - Beinhaltet die Initialisierung des Prozessors mit Start-up-Code 
+     (siehe `zusammenfassung.txt`, Zeile 91: „Wie setzt man einen Prozessor auf?“).
+   - Enthält ein Linker-Skript für das Memory-Layout.
+   - Liefert essenzielle Informationen für das Framework, z. B. Interrupt-Handler und System-Calls (wie malloc).
+
+3. Module:
+   - Hauptbestandteil der Firmware, bestehend aus einzelnen Blöcken mit definierten Operationen.
+   - Können spezifische Hardware-Module sein (z. B. Reset- oder Clock-Module) oder HAL-Module, die mehrere 
+     Hardware-Module steuern.
+   - Besonders wichtig: Transport-Module, die die interne Kommunikation regeln.
+   - Jedes Modul besteht aus zwei Dateien:
+     - `mod_<module_name>.c`: Enthält die Logik des Moduls und definiert dessen Funktionen.
+     - `config_<module_name>.c`: Speichert die zugehörigen Konfigurationsdaten.
+   - Das Framework erwartet ein festgelegtes Format für diese Dateien zur korrekten Initialisierung.
+   - Diese Trennung ermöglicht es, Module unabhängig voneinander zu entwickeln.
+   - ARM stellt eine Vielzahl fertiger Module bereit (z. B. Transport, SCMI, DVS, MPU), 
+     die lediglich eine produktspezifische Konfigurationsdatei benötigen.
+   - Eigene Module können ebenfalls definiert werden (siehe Dokumentation in `.md`-Dateien).
+
+-------------------------------------------------------------------------------
+
+Build-Prozess
+=============
+- Die Firmware wird mit CMake gebaut.
+- Bestimmte Dateien sind im Produkt-Ordner erforderlich, darunter:
+  - `CMakeLists.txt`
+  - `Firmware.cmake`
+  - `Toolchain-GNU.cmake`
+- Der Build-Prozess ist gut dokumentiert und lässt sich in den `.md`-Dokumentationsdateien nachlesen.
+
+-------------------------------------------------------------------------------
+
+Wie implementiert man die Firmware auf einem eigenen Produkt?
+=============================================================
+1. Architektur definieren
+   - Man kann entweder eine bestehende Architektur nutzen oder eine eigene integrieren.
+   - Dies erfordert kleine Anpassungen am Build-Projekt.
+   - Nach der Initialisierung muss an das Framework (`fwk_arch_init`) übergeben werden.
+   - Dabei wird u. a. ein Interrupt-Driver übergeben.
+
+2. Module auswählen und konfigurieren
+   - Jedes Modul benötigt eine `mod_<module_name>.c` und eine passende `config_<module_name>.c`.
+   - ARM stellt viele Module bereit, für die nur eine Konfigurationsdatei geschrieben werden muss.
+   - Eigene Module lassen sich ebenfalls leicht implementieren (siehe `framework.md`).
+   - In der CMake-Beschreibungsdatei müssen alle genutzten Module aufgelistet werden.
+   - Die Reihenfolge spielt eine Rolle, da Abhängigkeiten bei der Initialisierung berücksichtigt werden müssen.
+   - Einige Module sind zwingend erforderlich, damit die Firmware lauffähig ist.
+   - Ein sinnvoller Ansatz:
+     - Mit dem Transport-Modul beginnen.
+     - Compiler-Fehlermeldungen analysieren und die benötigten Module schrittweise hinzufügen.
+
+3. Firmware builden
+   - Falls alles richtig eingerichtet wurde, lässt sich die Firmware mit einem einzigen Befehl kompilieren.
+   - Der gesamte Build-Prozess ist in `.md`-Dateien dokumentiert.

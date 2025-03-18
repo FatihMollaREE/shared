@@ -1,0 +1,32 @@
+Was soll die firmware machen:
+
+Die firmware ist dazu da um dem eigentlichen application core (ap) Arbeit abzunehmen und so Ressourcen zu sparen. Hierbei uebernimmmt ein andere Prozessor (in unserem Fall der CR-52) einigen Aufgaben wie:
+	-Power Management
+	-Low Power-Modi
+	-Clock & Voltage Control
+	-Sensor Ueberwachung
+	-Speicherverwaltung 
+	-uvm. man kann eigene Funktionen einbrinen (wird im folgdenen noch erlaeutert)
+	
+Wie ist die Firmware aufgebaut:
+
+Die Firmware besteht aus 3 Layern:
+	1.Framework:
+		Sie stellt das aussere Geruesst der Firmware da und ist dafuer zustaendig dass die firmware korrekt initialisert wird und auch zur eigentlichen Runtime laeuft. Sie nutzt hierfuer Informationen von den zwei folgenden Layern der Architecture und der Module. Der Framework-Layer wird hierbei komplett von Arm gestellt und ist so generisch geschrieben, dass es keiner weiteren Anpassung benoetigt.
+		Hierin findet man auch die eingentlichen Main-loop die die firmware dann zur Runtime laueft und auf Events/Aufgaben wartet.
+	2.Architektur:
+		Sie beschreibt die spezielle Architektur des Produktes/Prozessor auf dem die SCP-firmware laufen soll. Hier muss unter anderem der Prozessor initialisert und aufgesetzt werden mit start-up code (siehe zusammenfassung.txt z.91 wie setzt man einen prozessor auf) sowie Linker-Skript fuer das Memory layout. Besonders wichtig sind hier auch die Informationen die das Framework benoetigt um richtig zu funkioneren wie die Interrupt Driver und andere System Calls die gemacht werden koennen (bsp.malloc).
+	3.Module
+		Module sind der Hauptbestandteil der firmware. Sie stellen unter anderem einzelne Bloecke da, die eine fest definierte Reihe an Operationen durchfuehren, dabei koennen diese konkrete Hardware-Module sein wie ein Reset- oder Clock-Modul welches Clocks und Resets setzt. Aber auch HAL-Module die wiederum selbst mehrere Hardware-Module steuern. Besonders wichtig heirbei sind die Transport Module wie das gleich benamte Transport-Modul welches die Kommunikation innerhalb der Firmware regelt.
+		Module lassen sich in 2 Teile aufteilen, einmal in das mod_<module_name>.c und das dazugehoerige config_<module_name>.c. Die mod..c Datei beschreibt hierbei was das Module macht und hier werden alle Funktionen die das Module besitzt definiert. Zudem wird der grobe Aufbau einer jeden mod..c Datei vorgebenen, sodass das Framework sie passend nutzten kann. Zugehoerig dazu gibt es dann immer jeweils eine config datei, in welche sich konfigurations Daten fuer die mod..c Datei finden lassen. Auch diese wird vom Framework auf eine fest definierte Art und Weise vom Framework zur Initialisierung erwartet.
+		Dieses trennen von mod..c und passender config datei birgt unter anderem auch den Vorteil, dass man diese getrennt voneinander entwickeln kann. So stellt Arm eine vielzahl an modulen bereit, wie Transport, Scmi, dvs, mpu uvm., welche nur eine passende auf das Produkt angepasste config datei brauchen.
+		Dementsprechend kann man aber auch eigene Module definieren. Wie diese aussehen sollen, laesst sich in passenden .md Datein nachlesen (siehe zusammenfassung.txt)
+		
+	Build-Prozess:
+		Die Firmware wird mit CMake gebuildet und erwartet deswegen auch bestimme Datein in dem Produkt Ordner wie CMakeLists.txt, Firmware.cmake und Toolchain-GNU.cmake. Was man aber alles braucht ist relativ gut dokumentiert und leasst sich nachlesen in den ganzen .md doc files.
+
+Wie geht man vor um die Firmware auf seinem Produkt zu implementieren:
+	1.Architekture beschreiben, entweder man nutzt hier bereits vorhandene Architekturen oder man integriert seine eigene. Dies erfodert auch einer kleinen Anpassung des Buildprojektes.
+		Wichtig ist nur dass man nach der ganzen Initialiserung an das Framwork (fwk_arch_init) uebergibt. Hier sieht man dann unteranderem auch dass man einen interrupt-driver uerbergeben muss usw. .
+	2.Alle Module die man nutzen will brauchen eine mod..c und config. Man kann wie gesagt bereitgestellte Module vom Arm nutzen und muss dann nur die Config dazu schreiben. Aber auch eigene Module lassen sich einfach implementieren (siehe framework.md). Wichtig ist hier dass man in den beschreibenden CMake Datei aufzaehlt welche Module man nutzt und auch die Reihenfolge spielt hier eine Rolle, da eventuelle Abhaengigkeiten bei der Initialiserung berucksichtigt werden muessen. Ebenso fuehren diese Abhaengigkeiten dazu, dass es ein paar Module gibt, die es zu intergrieren gilt damit die firmware uerbhaupt laueft. Ich wuerde hier anfangen mit dem transport module und dann mithilfe der compiler fehler stueck fuer stueck die benoetigten module zu implementieren.
+	3.Zum schlussm, falls man alles richtig gemacht hat, laesst sich die Firmware mit einem einfachen Befehl builden und auch der Build-Prozess ist in .md Datein beschrieben
