@@ -112,8 +112,9 @@ Ziel: SCP-Firmware auf dem V4M
 		->eigentliches builden:
 		-tmp: cmake . -B build -DSCP_FIRMWARE_SOURCE_DIR:PATH="rcar4/scp_ramfw"
 		
-		hilfe: $ cd .. && cmake . -B DEBUGbuild -DSCP_FIRMWARE_SOURCE_DIR:PATH="rcar4/scp_ramfw" && cd DEBUGBuild && make
-
+		hilfe: 
+			cd .. && cmake . -B DEBUGbuild -DSCP_FIRMWARE_SOURCE_DIR:PATH="rcar4/scp_ramfw" && cd DEBUGBuild && make
+	
 
 		.elf -> .srec:
 		 arm-none-eabi-objcopy -O srec rcar4-bl.elf rcar4-bl.srec
@@ -180,8 +181,3 @@ Ziel: SCP-Firmware auf dem V4M
 	
 		0x0		0x0?				0x0?	0x0					0x4?		
 		
-	-> noch zu implementieren:
-		-interrupts richtig ein und ausschalten, aktuell sind da nur dummys
-		ich glaube ich brauche die auch bzw muss die auslösen wenn ich scmi calls machen will
-		
-		wie soll der normale ablauf sein im betrieb?

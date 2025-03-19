@@ -1,3 +1,5 @@
+KI "Verschönerung" meiner scp-firmware Zusammenfassung:
+
 Was soll die Firmware machen?
 =============================
 Die Firmware entlastet den eigentlichen Application Core (AP) und spart so Ressourcen. 
@@ -78,3 +80,10 @@ Wie implementiert man die Firmware auf einem eigenen Produkt?
 3. Firmware builden
    - Falls alles richtig eingerichtet wurde, lässt sich die Firmware mit einem einzigen Befehl kompilieren.
    - Der gesamte Build-Prozess ist in `.md`-Dateien dokumentiert.
+
+	-Compiler: Arm GNU Toolchain arm-none-eabi/13.3 rel1
+	-Generator: CMAKE_GENERATOR="MinGW Makefiles"
+	-> cmake . -B build -DSCP_FIRMWARE_SOURCE_DIR:PATH="rcar4/scp_ramfw"
+	-> cd <build_order> && make
+	Debug build:
+		-im build ordner gibt es eine CMakeCache.txt, hier statt CMAKE_BUILD_TYPE:STRING=Release CMAKE_BUILD_TYPE:STRING=DEBUG setzten
